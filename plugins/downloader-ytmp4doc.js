@@ -5,7 +5,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 	conn.sendMessage(m.chat, { react: { text: '🕒', key: m.key }})
 	let obj = await ytmp3(text);
 	let title = obj.meta.title;
-	conn.sendFile(m.chat, obj.buffer, '', "", m, 0, {
+	conn.sendFile(m.chat, obj.buffer, '', "JITOSSA", m, 0, {
 		mimetype: "video/mp4",
 		fileName: `${title}.mp4`,
 		asDocument: true,
