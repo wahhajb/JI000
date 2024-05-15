@@ -6,7 +6,7 @@ import search from 'yt-search'
 let sentVideos = [];
 
 let handler = async (m, { conn, text }) => {
-  if (!text) return m.reply('Format: *.playvideo Kata Kunci*');
+  if (!text) return m.reply('Format: *بحـث وتحميـل الفيديوهـات تلقائيـا* \n\n *مثـال* \n .video goku ');
 
   conn.sendMessage(m.chat, {
     react: {
