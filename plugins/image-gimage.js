@@ -8,7 +8,7 @@
 /* [❗]                      [❗]                      [❗] */
 /* -------------------------------------------------------*/
 
-import { googleImage } from '@bochilteam/scraper';
+/*import { googleImage } from '@bochilteam/scraper';
 import sharp from 'sharp';
 import fetch from 'node-fetch';
 
