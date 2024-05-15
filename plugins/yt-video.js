@@ -6,7 +6,7 @@ import search from 'yt-search'
 let sentVideos = [];
 
 let handler = async (m, { conn, text }) => {
-  if (!text) return m.reply('Format: *بحـث وتحميـل الفيديوهـات تلقائيـا* \n\n *مثـال* \n .video goku ');
+  if (!text) return m.reply('*بحـث وتحميـل الفيديوهـات تلقائيـا* \n\n *مثـال* \n .video goku ');
 
   conn.sendMessage(m.chat, {
     react: {
@@ -66,7 +66,7 @@ let handler = async (m, { conn, text }) => {
   }
 };
 
-handler.help = ['vudeo'];
+handler.help = ['video'];
 handler.tags = ['downloader'];
 handler.command = /^video$/i;
 handler.register = false
