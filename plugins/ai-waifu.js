@@ -4,8 +4,8 @@ let handler = async (m, {
     usedPrefix
 }) => {
     await conn.sendMessage(m.chat, {
-        react: {
-            text: '⏳',
+        reply: {
+            text: 'hey',
             key: m.key,
         }
     })
