@@ -1,36 +1,79 @@
-import fetch from 'node-fetch'
-import fg from 'api-dylux'
+//Script by ShirokamiRyzen
 
+import fetch from 'node-fetch';
 
-const handler = async (m, { conn, args, usedPrefix, command }) => {
-  if (!args[0]) {
-    throw `*التحميل من فيسبوك*\n\n قم *بإرسال رابط الفيديو فيسبوك مع أمر التحميل هاكذا*\n ${usedPrefix + command} https://www.facebook.com/100082145413578/videos/795491955946201/?mibextid=rS40aB7S9Ucbxw6v`;
-  }
+let handler = async (m, { conn, args }) => {
 
-  const urlRegex = /^(?:https?:\/\/)?(?:www\.)?(?:facebook\.com|fb\.watch)\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/i;
-  if (!urlRegex.test(args[0])) {
-    throw 'أسفة ولكن الرابط لايعمل .'
-  }
+    if (!args[0]) throw 'المرجو إرسال Url الفيديو الذي تريد تحميله من البوت مع الأمر \n fb + Url';
+    const sender = m.sender.split(`@`)[0];
 
- await conn.relayMessage(m.chat, { reactionMessage: { key: m.key, text: '⌛'  }}, { messageId: m.key.id })
+    m.reply(wait);
 
-  try {
-    const result = await fg.fbdl(args[0]);
-    const tex = `> ғʙ ᴊɪᴛᴏssᴀ \n instagram.com/ovmar_1`
+    try {
+        const url = args[0];
+        const apiUrl = `https://widipe.com/download/fbdl?url=${url}`;
+        let response = await fetch(apiUrl);
+        let result = await response.json();
 
-    const response = await fetch(result.videoUrl)
-    const arrayBuffer = await response.arrayBuffer()
-    const videoBuffer = Buffer.from(arrayBuffer)
-    
-    conn.sendFile(m.chat, videoBuffer, 'fb.mp4', tex, m)
-  } catch (error) {
-    console.log(error)
-    m.reply('حدث خطأ حاول مرة أخرى رجاء أو تقدم بطلب صاحب البوت بالإصلاح أسفة')
-  }
-}
+        if (!result || !result.status || !result.result || (!result.result.HD && !result.result.Normal_video)) {
+            // Try the second API if the first one fails
+            const backupApiUrl = `https://widipe.com/download/fbdown?url=${url}`;
+            response = await fetch(backupApiUrl);
+            result = await response.json();
 
-handler.help = ['facebook <url>']
-handler.tags = ['downloader']
-handler.command = /^((facebook|fb)(downloder|dl)?)$/i
+            if (!result || !result.status || !result.result || !result.result.url) {
+                throw 'Failed to fetch video details from both APIs';
+            }
 
-export default handler
+            const videoLink = result.result.url.isHdAvailable ? result.result.url.urls[0].hd : result.result.url.urls[1].sd;
+            const caption = `
+*Title*: ${result.result.title || 'No title'}
+
+> *تابعني على إنستجرام من هنا* \n https://instagram.com/7vkoq`;
+
+            const videoBuffer = await fetch(videoLink).then(res => res.buffer());
+
+            await conn.sendMessage(
+                m.chat, {
+                video: videoBuffer,
+                mimetype: "video/mp4",
+                fileName: `video.mp4`,
+                caption: `Ini kak videonya @${sender} \n${caption}`,
+                mentions: [m.sender],
+            }, {
+                quoted: m
+            });
+        } else {
+            // Handle the first API response
+            const videoLink = result.result.HD || result.result.Normal_video;
+            const caption = `
+*Title*: ${result.result.title || 'No title'}
+
+> *تابعني على إنستجرام من هنا* \n https://instagram.com/7vkoq`;
+
+            const videoBuffer = await fetch(videoLink).then(res => res.buffer());
+
+            await conn.sendMessage(
+                m.chat, {
+                video: videoBuffer,
+                mimetype: "video/mp4",
+                fileName: `video.mp4`,
+                caption: `Ini kak videonya @${sender} \n${caption}`,
+                mentions: [m.sender],
+            }, {
+                quoted: m
+            });
+        }
+    } catch (error) {
+        console.error('Handler Error:', error);
+        conn.reply(m.chat, `An error occurred: ${error}`, m);
+    }
+};
+
+handler.help = ['fb <url>'];
+handler.tags = ['downloader'];
+handler.command = /^(fbdownload|facebook|fb(dl)?)$/i;
+
+handler.register = false;
+
+export default handler;
